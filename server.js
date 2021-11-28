@@ -10,14 +10,31 @@ app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true}))
 app.use(express.json())
 
+function saveNewNote(body, noteArray) {
+    const note = body
+    noteArray.push(note)
+    fs.writeFileSync(
+        path.join(__dirname, './db/db.json'),
+        JSON.stringify({ notes: noteArray}, null, 2)
+    )
+    return note
+}
+
+
+
 app.get('./api/notes', (req, res) => {
     res.json(notes)
+}) 
+ 
+app.post('/api/notes', (req,res) => {
+    const note = saveNewNote(req.body, notes)
+    res.json(note)
 })
 
-app.get('/', (req, res) => {
+ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'))
-})
-
+}) 
+ 
 app.get('./notes', (req, res) => {
     res.sendFile(path.join(__dirname, './public/notes.html'))
 })
