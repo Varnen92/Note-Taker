@@ -3,7 +3,6 @@ const path = require('path')
 const express = require('express')
 const { notes } = require('./db/db.json')
 const crypto = require("crypto")
-const id = crypto.randomBytes(16).toString("hex")
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -21,28 +20,32 @@ function saveNewNote(body, noteArray) {
     return note
 }
 
- app.post('/api/notes', (req, res) => {
+app.post('/api/notes', (req, res) => {
+    id = crypto.randomBytes(16).toString("hex")
     req.body.id = id
     const note = saveNewNote(req.body, notes)
     res.json(note)
 })
 
-  app.get('/', (req, res) => {
+app.delete('/api/notes/:id', (req, res) => {
+    console.log(req.params.id)
+})
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'))
 })
-   
+
 app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, './public/notes.html'))
 })
 
 app.get('/api/notes', (req, res) => {
     res.json(notes)
-  
+
 })
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'))
-}) 
+})
 
 app.listen(PORT, () => {
     console.log(`API Server now on port ${PORT}!`)
