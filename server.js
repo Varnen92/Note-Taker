@@ -19,7 +19,7 @@ function saveNewNote(body, noteArray) {
     )
     return note
 }
-
+// saves new notes and utilizes Crypto call to generate unique id
 app.post('/api/notes', (req, res) => {
     id = crypto.randomBytes(16).toString("hex")
     req.body.id = id
@@ -28,21 +28,26 @@ app.post('/api/notes', (req, res) => {
 })
 
 app.delete('/api/notes/:id', (req, res) => {
-    console.log(req.params.id)
+    var newArray = notes.filter(({ id }) => id !== req.params.id)
+    console.log(newArray)
+    fs.writeFileSync(
+        path.join(__dirname, './db/db.json'),
+        JSON.stringify({ notes: newArray}, null, 2)
+    )
+    res.json({ok: true})
 })
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'))
 })
-
+// sets notes address to notes.html
 app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, './public/notes.html'))
 })
-
+// api set for db.json file
 app.get('/api/notes', (req, res) => {
     res.json(notes)
-
 })
-
+// sets default page to index.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'))
 })
